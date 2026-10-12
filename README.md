@@ -1,3 +1,3 @@
 <p align="center">
-  <img src="app.png" alt="Application Screenshot" width="800">
+  <img src="app.png" alt="Application Screenshot" width="500">
 </p>
