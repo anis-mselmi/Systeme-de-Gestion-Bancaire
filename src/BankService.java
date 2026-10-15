@@ -29,6 +29,43 @@ public final class BankService {
     BankService(Path dataFile) {
         this.dataFile = dataFile;
         loadData();
+        if (persistenceEnabled && accounts.isEmpty()) {
+            seedSampleData();
+        }
+    }
+
+    /**
+     * Populates the bank with realistic demo accounts the first time the application
+     * runs (when no saved data file exists yet). The accounts are created through the
+     * normal deposit/withdraw/transfer methods so every balance is backed by a real
+     * transaction history, and the result is persisted to {@link #dataFile} like any
+     * other change.
+     */
+    private void seedSampleData() {
+        try {
+            Account amine = createAccount("Amine Ben Salah");
+            Account sonia = createAccount("Sonia Trabelsi");
+            Account youssef = createAccount("Youssef Gharbi");
+            Account leila = createAccount("Leila Haddad");
+            Account karim = createAccount("Karim Bouazizi");
+
+            deposit(amine.number(), new BigDecimal("4500.00"));
+            deposit(sonia.number(), new BigDecimal("12850.75"));
+            deposit(youssef.number(), new BigDecimal("980.50"));
+            deposit(leila.number(), new BigDecimal("23000.00"));
+            deposit(karim.number(), new BigDecimal("1500.00"));
+
+            withdraw(amine.number(), new BigDecimal("320.00"));
+            withdraw(leila.number(), new BigDecimal("1750.25"));
+            withdraw(sonia.number(), new BigDecimal("600.00"));
+
+            transfer(leila.number(), youssef.number(), new BigDecimal("2000.00"));
+            transfer(sonia.number(), amine.number(), new BigDecimal("450.00"));
+            transfer(karim.number(), youssef.number(), new BigDecimal("250.00"));
+        } catch (RuntimeException exception) {
+            // Seeding is best-effort; never let demo data block application startup.
+            startupWarning = "Could not create sample accounts: " + exception.getMessage();
+        }
     }
 
     public List<Account> accounts() {
